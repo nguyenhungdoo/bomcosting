@@ -64,11 +64,19 @@ export default function LoginPage() {
         {/* Logo */}
         <div style={{ position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <img
-              src="/elastec-logo.png.jpeg"
-              alt="ELASTEC"
-              style={{ width: '52px', height: '52px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
-            />
+            <div style={{
+              width: '56px', height: '56px', borderRadius: '12px',
+              background: 'white', padding: '6px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+              flexShrink: 0,
+            }}>
+              <img
+                src="/elastec-logo.png.jpeg"
+                alt="ELASTEC"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            </div>
             <div>
               <div style={{ color: 'white', fontWeight: 800, fontSize: '16px', letterSpacing: '0.5px', lineHeight: 1.2 }}>
                 ELASTEC INDUSTRIES JSC

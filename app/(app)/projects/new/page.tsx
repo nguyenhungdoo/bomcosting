@@ -3,13 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Building2, Phone, Mail, MapPin, FileText, StickyNote, Calendar, Plus } from 'lucide-react'
 import Link from 'next/link'
 
 export default function NewProjectPage() {
@@ -48,67 +43,107 @@ export default function NewProjectPage() {
     setLoading(false)
   }
 
+  const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all bg-white placeholder:text-gray-400"
+  const labelClass = "block text-sm font-medium text-gray-700 mb-1.5"
+
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard"><ArrowLeft size={16} className="mr-1" />Quay lại</Link>
-        </Button>
-        <h1 className="text-xl font-bold text-gray-900">Tạo dự án mới</h1>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <CardHeader><CardTitle className="text-base">Thông tin khách hàng</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
-            <div className="col-span-2 space-y-1.5">
-              <Label>Tên công ty / Khách hàng *</Label>
-              <Input placeholder="VD: Anh Nghia ANCL Co., Ltd" value={form.customer_name} onChange={e => set('customer_name', e.target.value)} required />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Người liên hệ</Label>
-              <Input placeholder="Mr. Nguyen Phi Long" value={form.customer_contact} onChange={e => set('customer_contact', e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Số điện thoại</Label>
-              <Input placeholder="0938 266 838" value={form.customer_phone} onChange={e => set('customer_phone', e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Email</Label>
-              <Input type="email" placeholder="contact@company.com" value={form.customer_email} onChange={e => set('customer_email', e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Ngày nhận yêu cầu</Label>
-              <Input type="date" value={form.received_date} onChange={e => set('received_date', e.target.value)} />
-            </div>
-            <div className="col-span-2 space-y-1.5">
-              <Label>Địa chỉ</Label>
-              <Input placeholder="Địa chỉ khách hàng" value={form.customer_address} onChange={e => set('customer_address', e.target.value)} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader><CardTitle className="text-base">Yêu cầu</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>Tiêu đề / Mô tả yêu cầu</Label>
-              <Input placeholder="VD: Yêu cầu báo giá các LK đúc nhựa" value={form.subject} onChange={e => set('subject', e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Ghi chú</Label>
-              <Textarea rows={3} placeholder="Ghi chú thêm..." value={form.notes} onChange={e => set('notes', e.target.value)} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end gap-3">
-          <Button type="button" variant="outline" asChild><Link href="/dashboard">Hủy</Link></Button>
-          <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700" disabled={loading}>
-            {loading ? 'Đang tạo...' : 'Tạo dự án'}
-          </Button>
+    <div className="min-h-screen bg-gray-50/50 p-8">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-8">
+          <Link href="/dashboard"
+            className="w-9 h-9 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-all shadow-sm">
+            <ArrowLeft size={16} />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Tạo dự án mới</h1>
+            <p className="text-sm text-gray-500">Nhập thông tin khách hàng và yêu cầu báo giá</p>
+          </div>
         </div>
-      </form>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Customer info */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                <Building2 size={16} className="text-indigo-600" />
+              </div>
+              <h2 className="font-semibold text-gray-800">Thông tin khách hàng</h2>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label className={labelClass}>Tên công ty / Khách hàng <span className="text-red-500">*</span></label>
+                <input className={inputClass} placeholder="VD: Anh Nghia ANCL Co., Ltd"
+                  value={form.customer_name} onChange={e => set('customer_name', e.target.value)} required />
+              </div>
+              <div>
+                <label className={labelClass}>Người liên hệ</label>
+                <div className="relative">
+                  <input className={inputClass + ' pl-9'} placeholder="Mr. Nguyen Van A"
+                    value={form.customer_contact} onChange={e => set('customer_contact', e.target.value)} />
+                </div>
+              </div>
+              <div>
+                <label className={labelClass}>Số điện thoại</label>
+                <input className={inputClass} placeholder="0938 266 838"
+                  value={form.customer_phone} onChange={e => set('customer_phone', e.target.value)} />
+              </div>
+              <div>
+                <label className={labelClass}>Email</label>
+                <input className={inputClass} type="email" placeholder="contact@company.com"
+                  value={form.customer_email} onChange={e => set('customer_email', e.target.value)} />
+              </div>
+              <div>
+                <label className={labelClass}>Ngày nhận yêu cầu</label>
+                <input className={inputClass} type="date"
+                  value={form.received_date} onChange={e => set('received_date', e.target.value)} />
+              </div>
+              <div className="col-span-2">
+                <label className={labelClass}>Địa chỉ</label>
+                <input className={inputClass} placeholder="Địa chỉ công ty khách hàng"
+                  value={form.customer_address} onChange={e => set('customer_address', e.target.value)} />
+              </div>
+            </div>
+          </div>
+
+          {/* Request info */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                <FileText size={16} className="text-indigo-600" />
+              </div>
+              <h2 className="font-semibold text-gray-800">Yêu cầu báo giá</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>Tiêu đề / Mô tả yêu cầu</label>
+                <input className={inputClass} placeholder="VD: Yêu cầu báo giá các LK đúc nhựa cho máy XYZ"
+                  value={form.subject} onChange={e => set('subject', e.target.value)} />
+              </div>
+              <div>
+                <label className={labelClass}>Ghi chú</label>
+                <textarea className={inputClass + ' resize-none'} rows={3} placeholder="Ghi chú thêm về yêu cầu..."
+                  value={form.notes} onChange={e => set('notes', e.target.value)} />
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-2">
+            <Link href="/dashboard"
+              className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all shadow-sm">
+              Hủy
+            </Link>
+            <button type="submit" disabled={loading}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-sm font-semibold transition-all shadow-md shadow-indigo-200 disabled:opacity-60"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+              {loading ? 'Đang tạo...' : <><Plus size={15} />Tạo dự án</>}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

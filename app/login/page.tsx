@@ -63,17 +63,19 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '0' }}>
-            <div style={{
-              width: '44px', height: '44px', borderRadius: '10px',
-              background: 'linear-gradient(135deg, #1e5ab4, #0ea5e9)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(14,165,233,0.35)',
-              fontWeight: 800, color: 'white', fontSize: '18px', letterSpacing: '-1px',
-            }}>E</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <img
+              src="/elastec-logo.png.jpeg"
+              alt="ELASTEC"
+              style={{ width: '52px', height: '52px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+            />
             <div>
-              <div style={{ color: 'white', fontWeight: 700, fontSize: '17px', letterSpacing: '0.5px' }}>ELASTEC JSC</div>
-              <div style={{ color: 'rgba(148,194,255,0.6)', fontSize: '11px', marginTop: '1px' }}>elastecjsc.com</div>
+              <div style={{ color: 'white', fontWeight: 800, fontSize: '16px', letterSpacing: '0.5px', lineHeight: 1.2 }}>
+                ELASTEC INDUSTRIES JSC
+              </div>
+              <div style={{ color: 'rgba(148,194,255,0.65)', fontSize: '11px', marginTop: '4px', lineHeight: 1.4 }}>
+                41 Đường số 7, KCN VSIP III<br />Tân Uyên, TP. HCM
+              </div>
             </div>
           </div>
         </div>

@@ -20,7 +20,7 @@ const settingsItems = [
 
 const roleMeta: Record<string, { label: string; color: string; bg: string }> = {
   director: { label: 'Giám đốc', color: 'text-sky-200',    bg: 'rgba(14,165,233,0.15)' },
-  technical: { label: 'Kỹ thuật', color: 'text-blue-200',  bg: 'rgba(99,102,241,0.15)' },
+  technical: { label: 'Kỹ Thuật', color: 'text-blue-200',  bg: 'rgba(99,102,241,0.15)' },
   sales:     { label: 'Sales',    color: 'text-emerald-200',bg: 'rgba(16,185,129,0.15)' },
 }
 

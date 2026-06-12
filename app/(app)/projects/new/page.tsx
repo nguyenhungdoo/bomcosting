@@ -18,12 +18,13 @@ export default function NewProjectPage() {
 
   const set = (f: string, v: string) => setForm(p => ({ ...p, [f]: v }))
 
-  function generateCode() {
+  function generateCode(customerName: string) {
+    const prefix = customerName.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 3).padEnd(3, 'X')
     const now = new Date()
     const yy = String(now.getFullYear()).slice(2)
     const mm = String(now.getMonth() + 1).padStart(2, '0')
-    const rand = String(Math.floor(Math.random() * 99) + 1).padStart(2, '0')
-    return `GPM${yy}${mm}T${rand}`
+    const seq = String(Math.floor(Math.random() * 99) + 1).padStart(2, '0')
+    return `${prefix}${yy}${mm}${seq}`
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -35,7 +36,7 @@ export default function NewProjectPage() {
     if (!user) { toast.error('Phiên đăng nhập hết hạn'); setLoading(false); return }
 
     const { data, error } = await supabase.from('projects').insert({
-      ...form, code: generateCode(), status: 'draft', created_by: user.id,
+      ...form, code: generateCode(form.customer_name), status: 'draft', created_by: user.id,
     }).select().single()
 
     if (error) { toast.error('Lỗi: ' + error.message) }

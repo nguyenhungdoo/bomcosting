@@ -2,25 +2,28 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, Package } from 'lucide-react'
 import type { Material, MaterialType } from '@/types/database'
 
-const typeConfig: Record<MaterialType, { label: string; color: string }> = {
-  resin:    { label: 'Nhựa',     color: 'bg-blue-100 text-blue-700' },
-  colorant: { label: 'Bột màu',  color: 'bg-yellow-100 text-yellow-700' },
-  ink:      { label: 'Mực in',   color: 'bg-purple-100 text-purple-700' },
-  other:    { label: 'Khác',     color: 'bg-gray-100 text-gray-700' },
+const typeConfig: Record<MaterialType, { label: string; color: string; bg: string }> = {
+  resin:    { label: 'Nhựa',    color: '#1d4ed8', bg: '#dbeafe' },
+  colorant: { label: 'Bột màu', color: '#92400e', bg: '#fef3c7' },
+  ink:      { label: 'Mực in',  color: '#6b21a8', bg: '#f3e8ff' },
+  other:    { label: 'Khác',    color: '#374151', bg: '#f3f4f6' },
 }
 
 const EMPTY = { code: '', name: '', type: 'resin' as MaterialType, unit_price: 0, unit: 'kg', supplier: '', notes: '' }
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', boxSizing: 'border-box' as const,
+  padding: '9px 12px', borderRadius: '8px',
+  border: '1.5px solid #e2e8f0', fontSize: '13px',
+  background: '#f8fafc', outline: 'none',
+}
 
 export default function MaterialsPage() {
   const [materials, setMaterials] = useState<Material[]>([])
@@ -31,8 +34,7 @@ export default function MaterialsPage() {
   const [saving, setSaving] = useState(false)
 
   async function load() {
-    const supabase = createClient()
-    const { data } = await supabase.from('materials').select('*').order('type').order('name')
+    const { data } = await createClient().from('materials').select('*').order('type').order('name')
     setMaterials(data ?? [])
   }
   useEffect(() => { load() }, [])
@@ -48,12 +50,9 @@ export default function MaterialsPage() {
     setSaving(true)
     const supabase = createClient()
     const payload = { ...form, updated_at: new Date().toISOString() }
-    let error
-    if (edit) {
-      ({ error } = await supabase.from('materials').update(payload).eq('id', edit.id))
-    } else {
-      ({ error } = await supabase.from('materials').insert(payload))
-    }
+    const { error } = edit
+      ? await supabase.from('materials').update(payload).eq('id', edit.id)
+      : await supabase.from('materials').insert(payload)
     if (error) toast.error('Lỗi: ' + error.message)
     else { toast.success('Đã lưu'); setOpen(false); load() }
     setSaving(false)
@@ -61,83 +60,119 @@ export default function MaterialsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm('Xóa vật liệu này?')) return
-    const supabase = createClient()
-    await supabase.from('materials').delete().eq('id', id)
+    await createClient().from('materials').delete().eq('id', id)
     load()
   }
 
   const filtered = filter === 'all' ? materials : materials.filter(m => m.type === filter)
+  const filters = [
+    { key: 'all', label: 'Tất cả' },
+    { key: 'resin', label: 'Nhựa' },
+    { key: 'colorant', label: 'Bột màu' },
+    { key: 'ink', label: 'Mực in' },
+    { key: 'other', label: 'Khác' },
+  ]
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Danh mục nguyên vật liệu</h1>
-        <Button onClick={openNew} className="bg-indigo-600 hover:bg-indigo-700">
-          <Plus size={16} className="mr-2" />Thêm vật liệu
-        </Button>
-      </div>
+    <div style={{ padding: '32px', minHeight: '100vh', background: '#f0f4f8' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
 
-      <div className="flex gap-2 mb-4">
-        {['all', 'resin', 'colorant', 'ink', 'other'].map(t => (
-          <Button key={t} size="sm" variant={filter === t ? 'default' : 'outline'}
-            onClick={() => setFilter(t)}
-            className={filter === t ? 'bg-indigo-600' : ''}>
-            {t === 'all' ? 'Tất cả' : typeConfig[t as MaterialType]?.label ?? t}
-          </Button>
-        ))}
-      </div>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Package size={19} color="#1d4ed8" />
+            </div>
+            <div>
+              <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Danh mục nguyên vật liệu</h1>
+              <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0' }}>{materials.length} vật liệu trong hệ thống</p>
+            </div>
+          </div>
+          <button onClick={openNew} style={{
+            display: 'flex', alignItems: 'center', gap: '7px',
+            padding: '9px 18px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+            background: 'linear-gradient(135deg, #1e5ab4, #0ea5e9)', color: 'white',
+            fontSize: '13px', fontWeight: 700, boxShadow: '0 4px 12px rgba(14,165,233,0.3)',
+          }}>
+            <Plus size={15} />Thêm vật liệu
+          </button>
+        </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <table className="w-full text-sm">
+        {/* Filter tabs */}
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '16px' }}>
+          {filters.map(f => (
+            <button key={f.key} onClick={() => setFilter(f.key)} style={{
+              padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
+              background: filter === f.key ? 'linear-gradient(135deg, #1e5ab4, #0ea5e9)' : 'white',
+              color: filter === f.key ? 'white' : '#475569',
+              boxShadow: filter === f.key ? '0 2px 8px rgba(14,165,233,0.25)' : '0 1px 3px rgba(0,0,0,0.06)',
+            }}>{f.label}</button>
+          ))}
+        </div>
+
+        {/* Table */}
+        <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+          <div style={{ height: '3px', background: 'linear-gradient(90deg, #1e5ab4, #0ea5e9, #38bdf8)' }} />
+          <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b bg-gray-50 text-gray-600">
-                <th className="text-left px-4 py-3">Mã</th>
-                <th className="text-left px-4 py-3">Tên</th>
-                <th className="text-left px-4 py-3">Loại</th>
-                <th className="text-right px-4 py-3">Đơn giá</th>
-                <th className="text-left px-4 py-3">Đơn vị</th>
-                <th className="text-left px-4 py-3">NCC</th>
-                <th className="px-4 py-3"></th>
+              <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                {['Mã', 'Tên vật liệu', 'Loại', 'Đơn giá (VND)', 'Đơn vị', 'Nhà cung cấp', ''].map(h => (
+                  <th key={h} style={{ padding: '12px 16px', textAlign: h === 'Đơn giá (VND)' ? 'right' : 'left', fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {filtered.map(m => {
                 const tc = typeConfig[m.type] ?? typeConfig.other
                 return (
-                  <tr key={m.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-mono text-xs">{m.code}</td>
-                    <td className="px-4 py-3 font-medium">{m.name}</td>
-                    <td className="px-4 py-3"><Badge className={`${tc.color} border-0 text-xs`}>{tc.label}</Badge></td>
-                    <td className="px-4 py-3 text-right font-mono">{new Intl.NumberFormat('vi-VN').format(m.unit_price)}</td>
-                    <td className="px-4 py-3 text-gray-500">{m.unit}</td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">{m.supplier ?? '—'}</td>
-                    <td className="px-4 py-3 flex gap-2 justify-end">
-                      <Button size="sm" variant="outline" onClick={() => openEdit(m)}><Pencil size={13} /></Button>
-                      <Button size="sm" variant="outline" className="text-red-500" onClick={() => handleDelete(m.id)}><Trash2 size={13} /></Button>
+                  <tr key={m.id} style={{ borderBottom: '1px solid #f8fafc' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8fafc'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
+                    <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontSize: '12px', color: '#1e5ab4', fontWeight: 600 }}>{m.code}</td>
+                    <td style={{ padding: '12px 16px', fontWeight: 600, color: '#0f172a' }}>{m.name}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600, color: tc.color, background: tc.bg }}>{tc.label}</span>
+                    </td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', fontFamily: 'monospace', fontWeight: 600, color: '#0f172a' }}>{new Intl.NumberFormat('vi-VN').format(m.unit_price)}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b' }}>{m.unit}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '12px' }}>{m.supplier ?? '—'}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', opacity: 0 }}
+                        className="row-actions"
+                        onMouseEnter={e => (e.currentTarget as HTMLElement).style.opacity = '1'}
+                        onMouseLeave={e => (e.currentTarget as HTMLElement).style.opacity = '0'}>
+                        <button onClick={() => openEdit(m)} style={{ padding: '6px', borderRadius: '7px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', color: '#64748b' }}><Pencil size={13} /></button>
+                        <button onClick={() => handleDelete(m.id)} style={{ padding: '6px', borderRadius: '7px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={13} /></button>
+                      </div>
                     </td>
                   </tr>
                 )
               })}
+              {filtered.length === 0 && (
+                <tr><td colSpan={7} style={{ padding: '48px', textAlign: 'center', color: '#94a3b8' }}>Chưa có vật liệu nào</td></tr>
+              )}
             </tbody>
           </table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{edit ? 'Sửa vật liệu' : 'Thêm vật liệu'}</DialogTitle></DialogHeader>
+        <DialogContent className="rounded-2xl max-w-lg">
+          <DialogHeader><DialogTitle>{edit ? 'Sửa vật liệu' : 'Thêm vật liệu mới'}</DialogTitle></DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-2">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Mã</label>
-              <Input placeholder="PA6" value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Tên *</label>
-              <Input placeholder="PA6 (Nylon 6)" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Loại</label>
+            {[
+              { key: 'code', label: 'Mã', placeholder: 'PA6', span: 1 },
+              { key: 'name', label: 'Tên *', placeholder: 'PA6 (Nylon 6)', span: 1 },
+            ].map(f => (
+              <div key={f.key}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>{f.label}</label>
+                <input style={inputStyle} placeholder={f.placeholder}
+                  value={(form as any)[f.key]}
+                  onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} />
+              </div>
+            ))}
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>Loại</label>
               <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v as MaterialType }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -148,8 +183,8 @@ export default function MaterialsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Đơn vị</label>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>Đơn vị</label>
               <Select value={form.unit} onValueChange={v => setForm(f => ({ ...f, unit: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -160,24 +195,27 @@ export default function MaterialsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="col-span-2 space-y-1.5">
-              <label className="text-sm font-medium">Đơn giá (VND / {form.unit})</label>
-              <Input type="number" min="0" value={form.unit_price} onChange={e => setForm(f => ({ ...f, unit_price: +e.target.value }))} />
+            <div className="col-span-2">
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>Đơn giá (VND / {form.unit})</label>
+              <input style={inputStyle} type="number" min="0"
+                value={form.unit_price}
+                onChange={e => setForm(f => ({ ...f, unit_price: +e.target.value }))} />
             </div>
-            <div className="col-span-2 space-y-1.5">
-              <label className="text-sm font-medium">Nhà cung cấp</label>
-              <Input value={form.supplier} onChange={e => setForm(f => ({ ...f, supplier: e.target.value }))} />
+            <div className="col-span-2">
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>Nhà cung cấp</label>
+              <input style={inputStyle} value={form.supplier}
+                onChange={e => setForm(f => ({ ...f, supplier: e.target.value }))} />
             </div>
-            <div className="col-span-2 space-y-1.5">
-              <label className="text-sm font-medium">Ghi chú</label>
+            <div className="col-span-2">
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>Ghi chú</label>
               <Textarea rows={2} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Hủy</Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
+          <DialogFooter className="gap-2">
+            <button onClick={() => setOpen(false)} style={{ padding: '9px 16px', borderRadius: '9px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: '#374151' }}>Hủy</button>
+            <button onClick={handleSave} disabled={saving} style={{ padding: '9px 20px', borderRadius: '9px', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1e5ab4, #0ea5e9)', color: 'white', fontSize: '13px', fontWeight: 700 }}>
               {saving ? 'Đang lưu...' : 'Lưu'}
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

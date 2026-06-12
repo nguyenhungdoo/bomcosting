@@ -9,17 +9,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+    .from('profiles').select('*').eq('id', user.id).single()
 
   if (!profile) redirect('/login')
 
   return (
-    <div className="flex min-h-screen">
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f4f8' }}>
       <Sidebar profile={profile as Profile} />
-      <main className="flex-1 overflow-auto bg-gray-50">
+      <main style={{ flex: 1, overflow: 'auto', background: '#f0f4f8' }}>
         {children}
       </main>
     </div>

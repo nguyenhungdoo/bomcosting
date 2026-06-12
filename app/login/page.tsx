@@ -102,7 +102,7 @@ export default function LoginPage() {
             </span>
           </div>
 
-          <h1 style={{
+          <h1 id="login-title" style={{
             color: 'white', fontSize: '2.6rem', fontWeight: 800,
             lineHeight: 1.15, marginBottom: '16px', letterSpacing: '-0.5px',
           }}>
@@ -113,7 +113,7 @@ export default function LoginPage() {
             }}>& Quotation</span>
           </h1>
 
-          <p style={{
+          <p id="login-desc" style={{
             color: 'rgba(180,210,255,0.75)', fontSize: '15px', lineHeight: 1.7,
             marginBottom: '36px', maxWidth: '400px',
           }}>
@@ -121,7 +121,7 @@ export default function LoginPage() {
           </p>
 
           {/* Features */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div id="login-features" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {features.map(({ icon: Icon, text }) => (
               <div key={text} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                 <div style={{
@@ -140,7 +140,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer certs */}
-        <div style={{ position: 'relative' }}>
+        <div id="login-left-footer" style={{ position: 'relative' }}>
           <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', marginBottom: '20px' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             {['ISO 9001', 'ISO 13485', 'ISO 22000', 'HACCP'].map(cert => (
@@ -277,8 +277,40 @@ export default function LoginPage() {
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         @media (max-width: 767px) {
-          #login-left  { display: none !important; }
-          #login-right { padding: 1.5rem 1rem !important; background: linear-gradient(160deg, #0a1628 0%, #0f2a52 100%) !important; min-height: 100vh; }
+          #login-layout { flex-direction: column !important; }
+
+          /* Left panel: compact strip on mobile */
+          #login-left {
+            flex: none !important;
+            padding: 2rem 1.5rem 1.75rem !important;
+          }
+          #login-left-footer { display: none !important; }
+
+          /* Hide long description text, keep logo + badge + title + features */
+          #login-desc { display: none !important; }
+
+          /* Features: 2-col grid on mobile */
+          #login-features {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+          }
+          #login-features > div {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 6px !important;
+          }
+          #login-features span { padding-top: 0 !important; font-size: 12px !important; }
+
+          /* Title smaller */
+          #login-title { font-size: 1.8rem !important; margin-bottom: 12px !important; }
+
+          /* Right panel */
+          #login-right {
+            flex: none !important;
+            background: #f8fafc !important;
+            padding: 1.5rem 1rem 2rem !important;
+          }
           #login-right > div { width: 100% !important; max-width: 100% !important; }
         }
       `}</style>

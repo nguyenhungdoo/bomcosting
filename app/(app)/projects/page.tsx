@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Plus, FolderOpen, ArrowUpRight, Search } from 'lucide-react'
+import { Plus, FolderOpen, ArrowUpRight } from 'lucide-react'
 import type { Project } from '@/types/database'
 
 const statusConfig = {
@@ -21,10 +21,10 @@ export default async function ProjectsPage() {
   const list = (projects ?? []) as Project[]
 
   const stats = [
-    { label: 'Tổng dự án',     value: list.length,                                       color: '#1e5ab4' },
-    { label: 'Đang thực hiện', value: list.filter(p => p.status === 'draft').length,      color: '#d97706' },
-    { label: 'Đã báo giá',     value: list.filter(p => p.status === 'quoted').length,     color: '#1d4ed8' },
-    { label: 'Đã xác nhận',    value: list.filter(p => p.status === 'confirmed').length,  color: '#065f46' },
+    { label: 'Tổng dự án',     value: list.length,                                      color: '#1e5ab4', bg: '#dbeafe' },
+    { label: 'Đang thực hiện', value: list.filter(p => p.status === 'draft').length,     color: '#d97706', bg: '#fef3c7' },
+    { label: 'Đã báo giá',     value: list.filter(p => p.status === 'quoted').length,    color: '#1d4ed8', bg: '#eff6ff' },
+    { label: 'Đã xác nhận',    value: list.filter(p => p.status === 'confirmed').length, color: '#065f46', bg: '#d1fae5' },
   ]
 
   return (
@@ -53,10 +53,10 @@ export default async function ProjectsPage() {
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '20px' }}>
           {stats.map(s => (
-            <div key={s.label} style={{ background: 'white', borderRadius: '12px', padding: '16px 20px', boxShadow: '0 1px 8px rgba(0,0,0,0.05)' }}>
-              <div style={{ fontSize: '26px', fontWeight: 800, color: s.color }}>{s.value}</div>
+            <div key={s.label} style={{ background: 'white', borderRadius: '12px', padding: '16px 20px', boxShadow: '0 1px 8px rgba(0,0,0,0.05)', borderLeft: `4px solid ${s.color}` }}>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: s.color }}>{s.value}</div>
               <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{s.label}</div>
             </div>
           ))}
@@ -87,11 +87,7 @@ export default async function ProjectsPage() {
               <thead>
                 <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
                   {['Mã dự án', 'Khách hàng', 'Nội dung', 'Trạng thái', 'Ngày tạo', ''].map(h => (
-                    <th key={h} style={{
-                      padding: '12px 20px', textAlign: 'left',
-                      fontSize: '11px', fontWeight: 700, color: '#94a3b8',
-                      textTransform: 'uppercase', letterSpacing: '0.5px',
-                    }}>{h}</th>
+                    <th key={h} style={{ padding: '12px 20px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -99,27 +95,20 @@ export default async function ProjectsPage() {
                 {list.map(project => {
                   const s = statusConfig[project.status as keyof typeof statusConfig] ?? statusConfig.draft
                   return (
-                    <tr key={project.id} style={{ borderBottom: '1px solid #f8fafc', transition: 'background 0.1s' }}
-                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8fafc'}
-                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
+                    <tr key={project.id} className="project-row" style={{ borderBottom: '1px solid #f8fafc' }}>
                       <td style={{ padding: '14px 20px' }}>
-                        <span style={{
-                          fontFamily: 'monospace', fontWeight: 700, fontSize: '12px',
-                          color: '#1e5ab4', background: '#dbeafe',
-                          padding: '3px 10px', borderRadius: '6px',
-                        }}>{project.code}</span>
-                      </td>
-                      <td style={{ padding: '14px 20px', fontWeight: 600, color: '#0f172a' }}>{project.customer_name}</td>
-                      <td style={{ padding: '14px 20px', color: '#64748b', maxWidth: '280px' }}>
-                        <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {project.subject ?? '—'}
+                        <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '12px', color: '#1e5ab4', background: '#dbeafe', padding: '3px 10px', borderRadius: '6px' }}>
+                          {project.code}
                         </span>
                       </td>
+                      <td style={{ padding: '14px 20px', fontWeight: 600, color: '#0f172a' }}>{project.customer_name}</td>
+                      <td style={{ padding: '14px 20px', color: '#64748b', maxWidth: '260px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {project.subject ?? '—'}
+                      </td>
                       <td style={{ padding: '14px 20px' }}>
-                        <span style={{
-                          padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600,
-                          color: s.color, background: s.bg, border: `1px solid ${s.border}`,
-                        }}>{s.label}</span>
+                        <span style={{ padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600, color: s.color, background: s.bg, border: `1px solid ${s.border}` }}>
+                          {s.label}
+                        </span>
                       </td>
                       <td style={{ padding: '14px 20px', color: '#94a3b8', fontSize: '12px' }}>
                         {new Date(project.created_at).toLocaleDateString('vi-VN')}
@@ -142,6 +131,10 @@ export default async function ProjectsPage() {
           )}
         </div>
       </div>
+
+      <style>{`
+        .project-row:hover { background: #f8fafc; }
+      `}</style>
     </div>
   )
 }

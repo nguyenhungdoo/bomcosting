@@ -5,14 +5,15 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile } from '@/types/database'
-import { LayoutDashboard, FolderOpen, Settings, LogOut, Wrench, Package, ChevronRight, Menu, X } from 'lucide-react'
+import { LayoutDashboard, FolderOpen, Settings, LogOut, Wrench, Package, ChevronRight, Menu, X, Users } from 'lucide-react'
 import { toast } from 'sonner'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/projects',  label: 'Dự án',     icon: FolderOpen },
+  { href: '/dashboard', label: 'Dashboard',    icon: LayoutDashboard },
+  { href: '/projects',  label: 'Dự án',        icon: FolderOpen },
 ]
 const settingsItems = [
+  { href: '/customers',          label: 'Khách hàng',      icon: Users },
   { href: '/settings/materials', label: 'Nguyên vật liệu', icon: Package },
   { href: '/settings/machines',  label: 'Máy ép',          icon: Wrench },
   { href: '/settings/cost',      label: 'Thông số chi phí', icon: Settings },

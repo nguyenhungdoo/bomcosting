@@ -20,9 +20,10 @@ const settingsItems = [
 ]
 
 const roleMeta: Record<string, { label: string; color: string; bg: string }> = {
-  director: { label: 'GIÁM ĐỐC', color: '#fbbf24',  bg: 'rgba(251,191,36,0.20)' },
-  technical: { label: 'KỸ THUẬT', color: '#93c5fd', bg: 'rgba(99,102,241,0.20)' },
-  sales:     { label: 'SALES',    color: '#6ee7b7',  bg: 'rgba(16,185,129,0.20)' },
+  director:   { label: 'GIÁM ĐỐC',  color: '#fbbf24', bg: 'rgba(251,191,36,0.20)' },
+  technical:  { label: 'KỸ THUẬT',  color: '#93c5fd', bg: 'rgba(99,102,241,0.20)' },
+  sales:      { label: 'SALES',     color: '#6ee7b7', bg: 'rgba(16,185,129,0.20)' },
+  purchasing: { label: 'MUA HÀNG',  color: '#f9a8d4', bg: 'rgba(236,72,153,0.20)' },
 }
 
 export function Sidebar({ profile }: { profile: Profile }) {

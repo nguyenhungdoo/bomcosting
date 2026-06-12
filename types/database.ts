@@ -60,6 +60,7 @@ export interface Project {
   customer_email?: string
   customer_phone?: string
   customer_address?: string
+  customer_logo_url?: string
   subject?: string
   received_date?: string
   status: ProjectStatus

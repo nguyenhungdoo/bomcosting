@@ -222,6 +222,9 @@ export function QuotationPreview({ open, onOpenChange, quotation, project, bomIt
           {/* ── SIGNATURES ── */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={{ border: '1px solid #e2e8f0', borderRadius: '10px', padding: '16px 20px', textAlign: 'center' }}>
+              {project.customer_logo_url && (
+                <img src={project.customer_logo_url} alt="Logo KH" style={{ height: '32px', objectFit: 'contain', margin: '0 auto 8px', display: 'block' }} />
+              )}
               <div style={{ fontSize: '11px', fontWeight: 700, color: '#374151' }}>{isVN ? 'ĐẠI DIỆN BÊN MUA' : "BUYER'S REPRESENTATIVE"}</div>
               <div style={{ fontSize: '10px', color: '#94a3b8', marginBottom: '50px' }}>{isVN ? 'Ký tên, đóng dấu' : 'Signature & Stamp'}</div>
               <div style={{ fontSize: '11px', fontWeight: 600, color: '#0f172a' }}>{project.customer_name}</div>

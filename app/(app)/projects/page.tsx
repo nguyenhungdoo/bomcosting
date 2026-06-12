@@ -28,7 +28,7 @@ export default async function ProjectsPage() {
   ]
 
   return (
-    <div style={{ padding: '32px', minHeight: '100vh', background: '#f0f4f8' }}>
+    <div className="page-root" style={{ padding: '32px', minHeight: '100vh', background: '#f0f4f8' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
         {/* Header */}
@@ -53,7 +53,7 @@ export default async function ProjectsPage() {
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '20px' }}>
+        <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '20px' }}>
           {stats.map(s => (
             <div key={s.label} style={{ background: 'white', borderRadius: '12px', padding: '16px 20px', boxShadow: '0 1px 8px rgba(0,0,0,0.05)', borderLeft: `4px solid ${s.color}` }}>
               <div style={{ fontSize: '28px', fontWeight: 800, color: s.color }}>{s.value}</div>
@@ -63,7 +63,8 @@ export default async function ProjectsPage() {
         </div>
 
         {/* Table */}
-        <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+        <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
+          <div className="table-scroll">
           <div style={{ height: '3px', background: 'linear-gradient(90deg, #1e5ab4, #0ea5e9, #38bdf8)' }} />
 
           {list.length === 0 ? (
@@ -129,6 +130,7 @@ export default async function ProjectsPage() {
               </tbody>
             </table>
           )}
+          </div>
         </div>
       </div>
 

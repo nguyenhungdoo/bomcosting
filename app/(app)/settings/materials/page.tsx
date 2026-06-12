@@ -74,7 +74,7 @@ export default function MaterialsPage() {
   ]
 
   return (
-    <div style={{ padding: '32px', minHeight: '100vh', background: '#f0f4f8' }}>
+    <div className="page-root" style={{ padding: '32px', minHeight: '100vh', background: '#f0f4f8' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
 
         {/* Header */}
@@ -111,8 +111,9 @@ export default function MaterialsPage() {
         </div>
 
         {/* Table */}
-        <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+        <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
           <div style={{ height: '3px', background: 'linear-gradient(90deg, #1e5ab4, #0ea5e9, #38bdf8)' }} />
+          <div className="table-scroll">
           <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
@@ -153,6 +154,7 @@ export default function MaterialsPage() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 

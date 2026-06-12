@@ -64,3 +64,33 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: hsl(220 13% 80%); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: hsl(220 13% 65%); }
+
+/* ── Mobile responsive ── */
+@media (max-width: 767px) {
+  /* Layout: sidebar fixed, main full width with top padding for mobile topbar */
+  #app-layout { display: block !important; }
+  #app-main   { padding-top: 56px !important; width: 100% !important; }
+
+  /* Page padding */
+  .page-root  { padding: 16px !important; }
+
+  /* Stats grids: 4-col → 2-col */
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+
+  /* Tables: horizontal scroll */
+  .table-scroll { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  .table-scroll table { min-width: 560px; }
+
+  /* Form 2-col → 1-col */
+  .form-grid-2 { grid-template-columns: 1fr !important; }
+
+  /* Tailwind grid overrides for dashboard */
+  .grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Dashboard table: horizontal scroll */
+  .overflow-hidden.rounded-2xl { overflow: visible !important; }
+  .w-full.text-sm { min-width: 520px; }
+
+  /* Smaller headings on mobile */
+  h1 { font-size: 16px !important; }
+}

@@ -14,9 +14,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!profile) redirect('/login')
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f4f8' }}>
+    <div id="app-layout" style={{ display: 'flex', minHeight: '100vh', background: '#f0f4f8' }}>
       <Sidebar profile={profile as Profile} />
-      <main style={{ flex: 1, overflow: 'auto', background: '#f0f4f8' }}>
+      <main id="app-main" style={{ flex: 1, overflow: 'auto', background: '#f0f4f8', minWidth: 0 }}>
         {children}
       </main>
     </div>

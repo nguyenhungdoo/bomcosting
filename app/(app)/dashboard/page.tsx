@@ -65,7 +65,7 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="page-root p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-5 mb-8">
+      <div className="stats-grid grid grid-cols-4 gap-5 mb-8">
         {statCards.map(stat => {
           const Icon = stat.icon
           return (
@@ -102,7 +102,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm" style={{ overflow: 'hidden' }}>
+        <div className="table-scroll">
         <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
           <h2 className="font-semibold text-gray-800 text-base">Dự án gần đây</h2>
           {list.length > 0 && (
@@ -169,6 +170,7 @@ export default async function DashboardPage() {
             </tbody>
           </table>
         )}
+        </div>
       </div>
     </div>
   )

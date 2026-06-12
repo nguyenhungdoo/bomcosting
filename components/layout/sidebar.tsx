@@ -1,11 +1,11 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile } from '@/types/database'
-import { cn } from '@/lib/utils'
-import { LayoutDashboard, FolderOpen, Settings, LogOut, Wrench, Package, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, FolderOpen, Settings, LogOut, Wrench, Package, ChevronRight, Menu, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 const navItems = [
@@ -19,14 +19,18 @@ const settingsItems = [
 ]
 
 const roleMeta: Record<string, { label: string; color: string; bg: string }> = {
-  director: { label: 'GIÁM ĐỐC', color: '#fbbf24',          bg: 'rgba(251,191,36,0.20)' },
-  technical: { label: 'KỸ THUẬT', color: '#93c5fd',         bg: 'rgba(99,102,241,0.20)' },
-  sales:     { label: 'SALES',    color: '#6ee7b7',          bg: 'rgba(16,185,129,0.20)' },
+  director: { label: 'GIÁM ĐỐC', color: '#fbbf24',  bg: 'rgba(251,191,36,0.20)' },
+  technical: { label: 'KỸ THUẬT', color: '#93c5fd', bg: 'rgba(99,102,241,0.20)' },
+  sales:     { label: 'SALES',    color: '#6ee7b7',  bg: 'rgba(16,185,129,0.20)' },
 }
 
 export function Sidebar({ profile }: { profile: Profile }) {
+  const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const router   = useRouter()
+
+  // Close drawer on route change
+  useEffect(() => { setMobileOpen(false) }, [pathname])
 
   async function handleLogout() {
     await createClient().auth.signOut()
@@ -35,21 +39,15 @@ export function Sidebar({ profile }: { profile: Profile }) {
     router.refresh()
   }
 
-  const role = roleMeta[profile.role] ?? { label: profile.role, color: 'text-gray-300', bg: 'rgba(255,255,255,0.1)' }
+  const role = roleMeta[profile.role] ?? { label: profile.role, color: '#cbd5e1', bg: 'rgba(255,255,255,0.1)' }
 
-  return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', width: '256px', minHeight: '100vh',
-      background: 'linear-gradient(160deg, #0a1628 0%, #0d1f3c 55%, #0f2a52 100%)',
-      borderRight: '1px solid rgba(255,255,255,0.06)',
-    }}>
-
-      {/* ── Logo ── */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+  const navContent = (
+    <>
+      {/* Logo */}
+      <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            width: '44px', height: '44px', borderRadius: '10px',
-            background: 'white', padding: '5px',
+            width: '44px', height: '44px', borderRadius: '10px', background: 'white', padding: '5px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 12px rgba(0,0,0,0.3)', flexShrink: 0,
           }}>
@@ -66,8 +64,8 @@ export function Sidebar({ profile }: { profile: Profile }) {
         </div>
       </div>
 
-      {/* ── User ── */}
-      <div style={{ margin: '12px 12px 4px', padding: '10px 12px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      {/* User */}
+      <div style={{ margin: '12px 12px 4px', padding: '10px 12px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
@@ -90,8 +88,8 @@ export function Sidebar({ profile }: { profile: Profile }) {
         </div>
       </div>
 
-      {/* ── Nav ── */}
-      <nav style={{ flex: 1, padding: '8px 10px' }}>
+      {/* Nav */}
+      <nav style={{ flex: 1, padding: '8px 10px', overflowY: 'auto' }}>
         {navItems.map(item => {
           const Icon = item.icon
           const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
@@ -117,7 +115,6 @@ export function Sidebar({ profile }: { profile: Profile }) {
           )
         })}
 
-        {/* Settings group */}
         <div style={{ padding: '16px 12px 6px', fontSize: '10px', fontWeight: 700, color: 'rgba(148,194,255,0.35)', letterSpacing: '1px', textTransform: 'uppercase' }}>
           Cài đặt
         </div>
@@ -147,8 +144,8 @@ export function Sidebar({ profile }: { profile: Profile }) {
         })}
       </nav>
 
-      {/* ── Logout ── */}
-      <div style={{ padding: '10px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      {/* Logout */}
+      <div style={{ padding: '10px', borderTop: '1px solid rgba(255,255,255,0.07)', flexShrink: 0 }}>
         <button onClick={handleLogout} style={{
           display: 'flex', alignItems: 'center', gap: '10px', width: '100%',
           padding: '9px 12px', borderRadius: '10px', border: 'none', background: 'transparent', cursor: 'pointer',
@@ -161,6 +158,98 @@ export function Sidebar({ profile }: { profile: Profile }) {
           Đăng xuất
         </button>
       </div>
-    </div>
+    </>
+  )
+
+  return (
+    <>
+      <style>{`
+        /* ── Desktop: sidebar in flow ── */
+        .sidebar-panel {
+          display: flex;
+          flex-direction: column;
+          width: 256px;
+          min-height: 100vh;
+          background: linear-gradient(160deg, #0a1628 0%, #0d1f3c 55%, #0f2a52 100%);
+          border-right: 1px solid rgba(255,255,255,0.06);
+          flex-shrink: 0;
+        }
+        .mobile-topbar { display: none; }
+        .mobile-overlay { display: none; }
+
+        /* ── Mobile: hamburger + slide drawer ── */
+        @media (max-width: 767px) {
+          .sidebar-panel {
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            min-height: unset;
+            z-index: 60;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.4);
+          }
+          .sidebar-panel.mobile-open {
+            transform: translateX(0);
+          }
+          .mobile-topbar {
+            display: flex;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            z-index: 50;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: linear-gradient(135deg, #0a1628, #0f2a52);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+          }
+          .mobile-overlay {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 59;
+          }
+        }
+      `}</style>
+
+      {/* ── Mobile top bar ── */}
+      <div className="mobile-topbar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '32px', height: '32px', background: 'white', borderRadius: '7px', padding: '3px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src="/elastec-logo.png.jpeg" alt="Elastec" style={{ width: '100%', objectFit: 'contain' }} />
+          </div>
+          <span style={{ color: 'white', fontWeight: 800, fontSize: '13px', letterSpacing: '0.3px' }}>ELASTEC</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '28px', height: '28px', borderRadius: '50%',
+            background: 'linear-gradient(135deg, #1e5ab4, #0ea5e9)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'white', fontWeight: 700, fontSize: '12px',
+          }}>
+            {profile.full_name?.[0]?.toUpperCase() ?? 'U'}
+          </div>
+          <button
+            onClick={() => setMobileOpen(o => !o)}
+            style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', cursor: 'pointer', color: 'white', padding: '6px 8px', display: 'flex', alignItems: 'center' }}
+          >
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Mobile overlay ── */}
+      {mobileOpen && (
+        <div className="mobile-overlay" onClick={() => setMobileOpen(false)} />
+      )}
+
+      {/* ── Sidebar panel ── */}
+      <div className={`sidebar-panel${mobileOpen ? ' mobile-open' : ''}`}>
+        {navContent}
+      </div>
+    </>
   )
 }

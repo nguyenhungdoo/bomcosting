@@ -50,7 +50,7 @@ export default function CostSettingsPage() {
   const totalOverhead = overheadFields.reduce((sum, f) => sum + (settings as any)[f.key], 0) * 100
 
   return (
-    <div style={{ padding: '32px', minHeight: '100vh', background: '#f0f4f8' }}>
+    <div className="page-root" style={{ padding: '32px', minHeight: '100vh', background: '#f0f4f8' }}>
       <div style={{ maxWidth: '720px', margin: '0 auto' }}>
 
         {/* Header */}

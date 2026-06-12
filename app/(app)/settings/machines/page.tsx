@@ -54,7 +54,7 @@ export default function MachinesPage() {
   const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all"
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-8">
+    <div className="page-root min-h-screen bg-gray-50/50 p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-7">
@@ -75,7 +75,7 @@ export default function MachinesPage() {
         </div>
 
         {/* Stats summary */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="stats-grid grid grid-cols-3 gap-4 mb-6">
           {[
             { label: 'Tổng số máy', value: machines.length, icon: Wrench, color: 'text-indigo-600', bg: 'bg-indigo-50' },
             { label: 'Lực kẹp lớn nhất', value: machines.length ? `${Math.max(...machines.map(m => m.tonnage))}T` : '—', icon: Zap, color: 'text-amber-600', bg: 'bg-amber-50' },
@@ -97,7 +97,8 @@ export default function MachinesPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div className="table-scroll">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-50">
@@ -146,6 +147,7 @@ export default function MachinesPage() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 

@@ -49,6 +49,11 @@ export function QuotationManager({ project, bomItems, costSettings, quotations: 
     overhead_profit: costSettings?.overhead_profit ?? 0.40,
     usd_rate: costSettings?.usd_rate ?? 25000,
     validity_days: 30,
+    delivery_mold_days: 45,
+    delivery_sample_days: 7,
+    delivery_production_days: 15,
+    payment_mold_deposit: 50,
+    incoterm: 'EXW',
   })
 
   const nextRev = (lang: QuotationLang) => {
@@ -74,6 +79,11 @@ export function QuotationManager({ project, bomItems, costSettings, quotations: 
       overhead_admin: overrides.overhead_admin,
       overhead_shipping: overrides.overhead_shipping,
       overhead_profit: overrides.overhead_profit,
+      delivery_mold_days: overrides.delivery_mold_days,
+      delivery_sample_days: overrides.delivery_sample_days,
+      delivery_production_days: overrides.delivery_production_days,
+      payment_mold_deposit: overrides.payment_mold_deposit,
+      incoterm: overrides.incoterm,
       status: 'draft',
       created_by: userId,
     }).select().single()
@@ -226,6 +236,38 @@ export function QuotationManager({ project, bomItems, costSettings, quotations: 
               <div className="space-y-1">
                 <Label className="text-xs">Tỷ giá USD</Label>
                 <Input type="number" value={overrides.usd_rate} onChange={e => setOverrides(o => ({ ...o, usd_rate: +e.target.value }))} />
+              </div>
+            </div>
+
+            {/* Delivery & Payment fields */}
+            <div className="border rounded p-3 space-y-2 text-sm">
+              <p className="font-medium text-gray-700">Điều khoản giao hàng & thanh toán</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { key: 'delivery_mold_days', label: 'Thời gian làm khuôn (ngày)' },
+                  { key: 'delivery_sample_days', label: 'Thời gian làm mẫu T1 (ngày)' },
+                  { key: 'delivery_production_days', label: 'Thời gian sản xuất (ngày)' },
+                  { key: 'payment_mold_deposit', label: 'Đặt cọc khuôn (%)' },
+                ].map(({ key, label }) => (
+                  <div key={key} className="space-y-1">
+                    <label className="text-xs text-gray-600">{label}</label>
+                    <Input
+                      type="number" min="0"
+                      className="h-7 text-xs"
+                      value={(overrides as any)[key]}
+                      onChange={e => setOverrides(o => ({ ...o, [key]: +e.target.value }))}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-gray-600">Incoterm / Điều kiện giao hàng</label>
+                <Input
+                  className="h-7 text-xs"
+                  value={overrides.incoterm}
+                  onChange={e => setOverrides(o => ({ ...o, incoterm: e.target.value }))}
+                  placeholder="EXW / FOB / DAP..."
+                />
               </div>
             </div>
 

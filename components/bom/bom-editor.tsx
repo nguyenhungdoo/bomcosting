@@ -115,9 +115,9 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
       yield_rate: form.yield_rate,
       material_id: form.material_id || null,
       material_spec: form.material_spec || null,
-      colorant_id: form.colorant_id || null,
+      colorant_id: (form.colorant_id && form.colorant_id !== '__none__') ? form.colorant_id : null,
       colorant_pct: form.colorant_pct,
-      ink_id: form.ink_id || null,
+      ink_id: (form.ink_id && form.ink_id !== '__none__') ? form.ink_id : null,
       ink_qty_per_pc: form.ink_qty_per_pc,
       machine_id: form.machine_id || null,
       cycle_time_s: form.cycle_time_s,
@@ -294,7 +294,7 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
               <Select value={form.colorant_id} onValueChange={v => setForm(f => ({ ...f, colorant_id: v }))}>
                 <SelectTrigger><SelectValue placeholder="Chọn bột màu..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Không có</SelectItem>
+                  <SelectItem value="__none__">Không có</SelectItem>
                   {colorants.map(m => <SelectItem key={m.id} value={m.id}>{m.name} — {new Intl.NumberFormat('vi-VN').format(m.unit_price)}đ/kg</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -308,7 +308,7 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
               <Select value={form.ink_id} onValueChange={v => setForm(f => ({ ...f, ink_id: v }))}>
                 <SelectTrigger><SelectValue placeholder="Chọn mực in..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Không có</SelectItem>
+                  <SelectItem value="__none__">Không có</SelectItem>
                   {inks.map(m => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
                 </SelectContent>
               </Select>

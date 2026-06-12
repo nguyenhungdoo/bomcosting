@@ -34,10 +34,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif' }}>
+    <div id="login-layout" style={{ display: 'flex', minHeight: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif' }}>
 
       {/* ─── LEFT: Branding ─── */}
-      <div style={{
+      <div id="login-left" style={{
         flex: '0 0 52%',
         background: 'linear-gradient(160deg, #0a1628 0%, #0d1f3c 50%, #0f2a52 100%)',
         display: 'flex',
@@ -158,7 +158,7 @@ export default function LoginPage() {
       </div>
 
       {/* ─── RIGHT: Login form ─── */}
-      <div style={{
+      <div id="login-right" style={{
         flex: 1,
         background: '#f8fafc',
         display: 'flex',
@@ -275,6 +275,12 @@ export default function LoginPage() {
 
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        @media (max-width: 767px) {
+          #login-left  { display: none !important; }
+          #login-right { padding: 1.5rem 1rem !important; background: linear-gradient(160deg, #0a1628 0%, #0f2a52 100%) !important; min-height: 100vh; }
+          #login-right > div { width: 100% !important; max-width: 100% !important; }
+        }
       `}</style>
     </div>
   )

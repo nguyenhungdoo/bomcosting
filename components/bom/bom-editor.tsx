@@ -29,6 +29,7 @@ const EMPTY_FORM = {
   colorant_id: '', colorant_pct: 0,
   ink_id: '', ink_qty_per_pc: 0,
   machine_id: '', cycle_time_s: 60,
+  metal_insert_name: '', metal_insert_qty: 0, metal_insert_unit_price: 0,
 }
 
 export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }: Props) {
@@ -69,6 +70,9 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
       ink_qty_per_pc: item.ink_qty_per_pc,
       machine_id: item.machine_id ?? '',
       cycle_time_s: item.cycle_time_s,
+      metal_insert_name: item.metal_insert_name ?? '',
+      metal_insert_qty: item.metal_insert_qty ?? 0,
+      metal_insert_unit_price: item.metal_insert_unit_price ?? 0,
     })
     setImageUrl(item.image_url ?? '')
     setEditItem(item)
@@ -121,6 +125,9 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
       ink_qty_per_pc: form.ink_qty_per_pc,
       machine_id: form.machine_id || null,
       cycle_time_s: form.cycle_time_s,
+      metal_insert_name: form.metal_insert_name || null,
+      metal_insert_qty: form.metal_insert_qty,
+      metal_insert_unit_price: form.metal_insert_unit_price,
       image_url: imageUrl || null,
       updated_at: new Date().toISOString(),
     }
@@ -241,112 +248,144 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
         </div>
       )}
 
-      {/* BOM Dialog */}
+      {/* BOM Dialog — landscape */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editItem ? 'Sửa chi tiết BOM' : 'Thêm chi tiết BOM'}</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-2">
-            <div className="space-y-1.5">
-              <Label>Part Number</Label>
-              <Input placeholder="710012407" value={form.part_number} onChange={e => setForm(f => ({ ...f, part_number: e.target.value }))} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Tên sản phẩm</Label>
-              <Input placeholder="Tên chi tiết" value={form.part_name} onChange={e => setForm(f => ({ ...f, part_name: e.target.value }))} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Màu sắc</Label>
-              <Input placeholder="Black / GRY24520UV..." value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Cavity (số lòng khuôn)</Label>
-              <Input type="number" min="1" value={form.cavity} onChange={e => setForm(f => ({ ...f, cavity: +e.target.value }))} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Trọng lượng sản phẩm (g)</Label>
-              <Input type="number" step="0.001" min="0" value={form.weight_g} onChange={e => setForm(f => ({ ...f, weight_g: +e.target.value }))} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Tỷ lệ đạt (Yield Rate)</Label>
-              <Input type="number" step="0.01" min="0" max="1" value={form.yield_rate} onChange={e => setForm(f => ({ ...f, yield_rate: +e.target.value }))} />
+
+          {/* Layout: 3 columns side by side */}
+          <div className="grid grid-cols-3 gap-x-6 gap-y-0 py-2">
+
+            {/* ── Cột 1: Thông tin cơ bản ── */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider border-b pb-1">Thông tin cơ bản</p>
+              <div className="space-y-1.5">
+                <Label>Part Number</Label>
+                <Input placeholder="710012407" value={form.part_number} onChange={e => setForm(f => ({ ...f, part_number: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Tên sản phẩm</Label>
+                <Input placeholder="Tên chi tiết" value={form.part_name} onChange={e => setForm(f => ({ ...f, part_name: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Màu sắc</Label>
+                <Input placeholder="Black / GRY24520UV..." value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Cavity (số lòng khuôn)</Label>
+                <Input type="number" min="1" value={form.cavity} onChange={e => setForm(f => ({ ...f, cavity: +e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Trọng lượng sản phẩm (g)</Label>
+                <Input type="number" step="0.001" min="0" value={form.weight_g} onChange={e => setForm(f => ({ ...f, weight_g: +e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Tỷ lệ đạt (Yield Rate)</Label>
+                <Input type="number" step="0.01" min="0" max="1" value={form.yield_rate} onChange={e => setForm(f => ({ ...f, yield_rate: +e.target.value }))} />
+              </div>
+
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider border-b pb-1 pt-2">Thông số ép</p>
+              <div className="space-y-1.5">
+                <Label>Máy ép *</Label>
+                <Select value={form.machine_id} onValueChange={v => setForm(f => ({ ...f, machine_id: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Chọn máy..." /></SelectTrigger>
+                  <SelectContent>
+                    {machines.map(m => <SelectItem key={m.id} value={m.id}>{m.code} — {m.tonnage}T ({m.kwh}kWh)</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Chu kỳ ép (giây)</Label>
+                <Input type="number" min="1" value={form.cycle_time_s} onChange={e => setForm(f => ({ ...f, cycle_time_s: +e.target.value }))} />
+              </div>
             </div>
 
-            <div className="col-span-2 border-t pt-3">
-              <p className="text-sm font-medium text-gray-700 mb-3">Nguyên vật liệu</p>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Loại nhựa *</Label>
-              <Select value={form.material_id} onValueChange={v => setForm(f => ({ ...f, material_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="Chọn nhựa..." /></SelectTrigger>
-                <SelectContent>
-                  {resins.map(m => <SelectItem key={m.id} value={m.id}>{m.name} — {new Intl.NumberFormat('vi-VN').format(m.unit_price)}đ/kg</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Đặc tính nhựa</Label>
-              <Input placeholder="33GF, max 20% Regrind..." value={form.material_spec} onChange={e => setForm(f => ({ ...f, material_spec: e.target.value }))} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Bột màu</Label>
-              <Select value={form.colorant_id} onValueChange={v => setForm(f => ({ ...f, colorant_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="Chọn bột màu..." /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Không có</SelectItem>
-                  {colorants.map(m => <SelectItem key={m.id} value={m.id}>{m.name} — {new Intl.NumberFormat('vi-VN').format(m.unit_price)}đ/kg</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Tỷ lệ bột màu (%)</Label>
-              <Input type="number" step="0.1" min="0" max="100" value={form.colorant_pct * 100} onChange={e => setForm(f => ({ ...f, colorant_pct: +e.target.value / 100 }))} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Mực in</Label>
-              <Select value={form.ink_id} onValueChange={v => setForm(f => ({ ...f, ink_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="Chọn mực in..." /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Không có</SelectItem>
-                  {inks.map(m => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Lượng mực in / sản phẩm (g)</Label>
-              <Input type="number" step="0.001" min="0" value={form.ink_qty_per_pc} onChange={e => setForm(f => ({ ...f, ink_qty_per_pc: +e.target.value }))} />
-            </div>
-
-            <div className="col-span-2 border-t pt-3">
-              <p className="text-sm font-medium text-gray-700 mb-3">Thông số ép</p>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Máy ép *</Label>
-              <Select value={form.machine_id} onValueChange={v => setForm(f => ({ ...f, machine_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="Chọn máy..." /></SelectTrigger>
-                <SelectContent>
-                  {machines.map(m => <SelectItem key={m.id} value={m.id}>{m.code} — {m.tonnage}T ({m.kwh}kWh)</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Chu kỳ ép (giây)</Label>
-              <Input type="number" min="1" value={form.cycle_time_s} onChange={e => setForm(f => ({ ...f, cycle_time_s: +e.target.value }))} />
+            {/* ── Cột 2: Nguyên vật liệu nhựa ── */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider border-b pb-1">Nguyên vật liệu nhựa</p>
+              <div className="space-y-1.5">
+                <Label>Loại nhựa *</Label>
+                <Select value={form.material_id} onValueChange={v => setForm(f => ({ ...f, material_id: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Chọn nhựa..." /></SelectTrigger>
+                  <SelectContent>
+                    {resins.map(m => <SelectItem key={m.id} value={m.id}>{m.name} — {new Intl.NumberFormat('vi-VN').format(m.unit_price)}đ/kg</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Đặc tính nhựa</Label>
+                <Input placeholder="33GF, max 20% Regrind..." value={form.material_spec} onChange={e => setForm(f => ({ ...f, material_spec: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Bột màu</Label>
+                <Select value={form.colorant_id} onValueChange={v => setForm(f => ({ ...f, colorant_id: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Chọn bột màu..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Không có</SelectItem>
+                    {colorants.map(m => <SelectItem key={m.id} value={m.id}>{m.name} — {new Intl.NumberFormat('vi-VN').format(m.unit_price)}đ/kg</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Tỷ lệ bột màu (%)</Label>
+                <Input type="number" step="0.1" min="0" max="100" value={form.colorant_pct * 100} onChange={e => setForm(f => ({ ...f, colorant_pct: +e.target.value / 100 }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Mực in</Label>
+                <Select value={form.ink_id} onValueChange={v => setForm(f => ({ ...f, ink_id: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Chọn mực in..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Không có</SelectItem>
+                    {inks.map(m => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Lượng mực in / sản phẩm (g)</Label>
+                <Input type="number" step="0.001" min="0" value={form.ink_qty_per_pc} onChange={e => setForm(f => ({ ...f, ink_qty_per_pc: +e.target.value }))} />
+              </div>
             </div>
 
-            <div className="col-span-2 space-y-1.5">
-              <Label>Hình ảnh sản phẩm</Label>
-              <div className="flex items-center gap-3">
+            {/* ── Cột 3: Kim loại insert + ảnh ── */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wider border-b border-indigo-200 pb-1">Kim Loại / Metal Insert</p>
+              <div className="space-y-1.5">
+                <Label>Tên kim loại insert</Label>
+                <Input placeholder="M4 Brass Nut, Steel Pin..." value={form.metal_insert_name} onChange={e => setForm(f => ({ ...f, metal_insert_name: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Số lượng / sản phẩm (cái)</Label>
+                <Input type="number" min="0" value={form.metal_insert_qty} onChange={e => setForm(f => ({ ...f, metal_insert_qty: +e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Đơn giá (VND/cái)</Label>
+                <Input type="number" min="0" step="100" value={form.metal_insert_unit_price} onChange={e => setForm(f => ({ ...f, metal_insert_unit_price: +e.target.value }))} />
+              </div>
+              {form.metal_insert_qty > 0 && form.metal_insert_unit_price > 0 && (
+                <div className="bg-indigo-50 rounded-lg p-3 text-sm">
+                  <span className="text-gray-500">Chi phí insert / sp: </span>
+                  <span className="font-semibold text-indigo-700">
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(form.metal_insert_qty * form.metal_insert_unit_price)}
+                  </span>
+                </div>
+              )}
+
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider border-b pb-1 pt-2">Hình ảnh sản phẩm</p>
+              <div className="space-y-1.5">
                 <input ref={fileRef} type="file" accept="image/*" className="hidden"
                   onChange={e => { const f = e.target.files?.[0]; if (f) handleUploadImage(f) }} />
-                <Button type="button" variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading}>
-                  <Image size={16} className="mr-2" />{uploading ? 'Đang upload...' : 'Chọn ảnh'}
-                </Button>
-                {imageUrl && <img src={imageUrl} alt="" className="w-12 h-12 object-cover rounded" />}
+                <div className="flex items-center gap-3">
+                  <Button type="button" variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading}>
+                    <Image size={16} className="mr-2" />{uploading ? 'Đang upload...' : 'Chọn ảnh'}
+                  </Button>
+                  {imageUrl && <img src={imageUrl} alt="" className="w-12 h-12 object-cover rounded" />}
+                </div>
               </div>
             </div>
           </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Hủy</Button>
             <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">

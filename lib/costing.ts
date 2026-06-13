@@ -10,6 +10,7 @@ export interface CostBreakdown {
   resin_cost_per_pc: number
   colorant_cost_per_pc: number
   ink_cost_per_pc: number
+  metal_insert_cost_per_pc: number
   material_cost_per_pc: number
   // Tổng
   base_cost_per_pc: number
@@ -62,7 +63,9 @@ export function calcCost(item: BomItem, settings: CostSettings, overrides?: Part
   const ink_price = item.ink?.unit_price ?? 0
   const ink_cost_per_pc = item.ink_qty_per_pc * ink_price
 
-  const material_cost_per_pc = resin_cost_per_pc + colorant_cost_per_pc + ink_cost_per_pc
+  const metal_insert_cost_per_pc = (item.metal_insert_qty ?? 0) * (item.metal_insert_unit_price ?? 0)
+
+  const material_cost_per_pc = resin_cost_per_pc + colorant_cost_per_pc + ink_cost_per_pc + metal_insert_cost_per_pc
 
   // --- Tổng giá thành cơ bản ---
   const base_cost_per_pc = processing_cost_per_pc + material_cost_per_pc
@@ -91,6 +94,7 @@ export function calcCost(item: BomItem, settings: CostSettings, overrides?: Part
     resin_cost_per_pc,
     colorant_cost_per_pc,
     ink_cost_per_pc,
+    metal_insert_cost_per_pc,
     material_cost_per_pc,
     base_cost_per_pc,
     total_overhead_pct,
@@ -106,7 +110,7 @@ function zeroCost(s: CostSettings): CostBreakdown {
   return {
     electricity_cost_per_shot: 0, depreciation_cost_per_shot: 0, labor_cost_per_shot: 0,
     processing_cost_per_pc: 0, resin_cost_per_pc: 0, colorant_cost_per_pc: 0,
-    ink_cost_per_pc: 0, material_cost_per_pc: 0, base_cost_per_pc: 0,
+    ink_cost_per_pc: 0, metal_insert_cost_per_pc: 0, material_cost_per_pc: 0, base_cost_per_pc: 0,
     total_overhead_pct, unit_price_vnd: 0, unit_price_usd: 0,
     capacity_daily: 0, capacity_monthly: 0,
   }

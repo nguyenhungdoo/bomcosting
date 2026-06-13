@@ -87,6 +87,9 @@ export function CostingView({ bomItems, costSettings }: Props) {
                 <Row label={`Nhựa (${item.material?.name ?? '?'}, ${item.weight_g}g)`} value={formatVND(cost.resin_cost_per_pc)} />
                 {cost.colorant_cost_per_pc > 0 && <Row label="Bột màu" value={formatVND(cost.colorant_cost_per_pc)} />}
                 {cost.ink_cost_per_pc > 0 && <Row label="Mực in" value={formatVND(cost.ink_cost_per_pc)} />}
+                {cost.metal_insert_cost_per_pc > 0 && (
+                  <Row label={`Kim loại insert (${item.metal_insert_name ?? 'Insert'} ×${item.metal_insert_qty})`} value={formatVND(cost.metal_insert_cost_per_pc)} />
+                )}
                 <Row label="Tổng NVL" value={formatVND(cost.material_cost_per_pc)} bold />
               </div>
             </div>

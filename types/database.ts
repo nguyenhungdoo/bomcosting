@@ -88,6 +88,9 @@ export interface BomItem {
   ink_qty_per_pc: number
   machine_id?: string
   cycle_time_s: number
+  metal_insert_name?: string
+  metal_insert_qty: number
+  metal_insert_unit_price: number
   image_url?: string
   created_at: string
   updated_at: string

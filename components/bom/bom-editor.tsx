@@ -46,6 +46,7 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
   const resins = materials.filter(m => m.type === 'resin')
   const colorants = materials.filter(m => m.type === 'colorant')
   const inks = materials.filter(m => m.type === 'ink')
+  const metalInserts = materials.filter(m => m.type === 'metal_insert')
 
   function openNew() {
     setForm({ ...EMPTY_FORM })
@@ -350,10 +351,26 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
 
             {/* ── Cột 3: Kim loại insert + ảnh ── */}
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wider border-b border-indigo-200 pb-1">Kim Loại / Metal Insert</p>
+              <p className="text-xs font-semibold text-teal-600 uppercase tracking-wider border-b border-teal-200 pb-1">Kim Loại / Metal Insert</p>
               <div className="space-y-1.5">
-                <Label>Tên kim loại insert</Label>
-                <Input placeholder="M4 Brass Nut, Steel Pin..." value={form.metal_insert_name} onChange={e => setForm(f => ({ ...f, metal_insert_name: e.target.value }))} />
+                <Label>Loại kim loại insert</Label>
+                <Select value={form.metal_insert_name || '__none__'} onValueChange={v => {
+                  if (v === '__none__') {
+                    setForm(f => ({ ...f, metal_insert_name: '', metal_insert_unit_price: 0 }))
+                  } else {
+                    const m = metalInserts.find(x => x.id === v)
+                    setForm(f => ({ ...f, metal_insert_name: m?.name ?? v, metal_insert_unit_price: m?.unit_price ?? 0 }))
+                  }
+                }}>
+                  <SelectTrigger><SelectValue placeholder="Chọn kim loại..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Không có</SelectItem>
+                    {metalInserts.map(m => <SelectItem key={m.id} value={m.id}>{m.name} — {new Intl.NumberFormat('vi-VN').format(m.unit_price)}đ/cái</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                {metalInserts.length === 0 && (
+                  <p className="text-xs text-gray-400">Thêm kim loại tại Cài đặt → Nguyên vật liệu</p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label>Số lượng / sản phẩm (cái)</Label>
@@ -364,9 +381,9 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
                 <Input type="number" min="0" step="100" value={form.metal_insert_unit_price} onChange={e => setForm(f => ({ ...f, metal_insert_unit_price: +e.target.value }))} />
               </div>
               {form.metal_insert_qty > 0 && form.metal_insert_unit_price > 0 && (
-                <div className="bg-indigo-50 rounded-lg p-3 text-sm">
+                <div className="bg-teal-50 rounded-lg p-3 text-sm border border-teal-100">
                   <span className="text-gray-500">Chi phí insert / sp: </span>
-                  <span className="font-semibold text-indigo-700">
+                  <span className="font-semibold text-teal-700">
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(form.metal_insert_qty * form.metal_insert_unit_price)}
                   </span>
                 </div>

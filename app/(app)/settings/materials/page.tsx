@@ -10,10 +10,11 @@ import { Plus, Pencil, Trash2, Package } from 'lucide-react'
 import type { Material, MaterialType } from '@/types/database'
 
 const typeConfig: Record<MaterialType, { label: string; color: string; bg: string }> = {
-  resin:    { label: 'Nhựa',    color: '#1d4ed8', bg: '#dbeafe' },
-  colorant: { label: 'Bột màu', color: '#92400e', bg: '#fef3c7' },
-  ink:      { label: 'Mực in',  color: '#6b21a8', bg: '#f3e8ff' },
-  other:    { label: 'Khác',    color: '#374151', bg: '#f3f4f6' },
+  resin:        { label: 'Nhựa',         color: '#1d4ed8', bg: '#dbeafe' },
+  colorant:     { label: 'Bột màu',      color: '#92400e', bg: '#fef3c7' },
+  ink:          { label: 'Mực in',       color: '#6b21a8', bg: '#f3e8ff' },
+  metal_insert: { label: 'Kim loại',     color: '#0f766e', bg: '#ccfbf1' },
+  other:        { label: 'Khác',         color: '#374151', bg: '#f3f4f6' },
 }
 
 const EMPTY = { code: '', name: '', type: 'resin' as MaterialType, unit_price: 0, unit: 'kg', supplier: '', notes: '' }
@@ -66,11 +67,12 @@ export default function MaterialsPage() {
 
   const filtered = filter === 'all' ? materials : materials.filter(m => m.type === filter)
   const filters = [
-    { key: 'all', label: 'Tất cả' },
-    { key: 'resin', label: 'Nhựa' },
-    { key: 'colorant', label: 'Bột màu' },
-    { key: 'ink', label: 'Mực in' },
-    { key: 'other', label: 'Khác' },
+    { key: 'all',          label: 'Tất cả' },
+    { key: 'resin',        label: 'Nhựa' },
+    { key: 'colorant',     label: 'Bột màu' },
+    { key: 'ink',          label: 'Mực in' },
+    { key: 'metal_insert', label: 'Kim loại' },
+    { key: 'other',        label: 'Khác' },
   ]
 
   return (
@@ -181,6 +183,7 @@ export default function MaterialsPage() {
                   <SelectItem value="resin">Nhựa</SelectItem>
                   <SelectItem value="colorant">Bột màu</SelectItem>
                   <SelectItem value="ink">Mực in</SelectItem>
+                  <SelectItem value="metal_insert">Kim loại / Metal Insert</SelectItem>
                   <SelectItem value="other">Khác</SelectItem>
                 </SelectContent>
               </Select>

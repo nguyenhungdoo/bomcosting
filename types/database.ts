@@ -1,7 +1,7 @@
 export type Role = 'sales' | 'technical' | 'director'
 export type ProjectStatus = 'draft' | 'in_review' | 'quoted' | 'confirmed' | 'cancelled'
 export type QuotationStatus = 'draft' | 'sent' | 'approved' | 'rejected'
-export type MaterialType = 'resin' | 'colorant' | 'ink' | 'other'
+export type MaterialType = 'resin' | 'colorant' | 'ink' | 'metal_insert' | 'other'
 export type QuotationLang = 'vn' | 'en'
 
 export interface Profile {

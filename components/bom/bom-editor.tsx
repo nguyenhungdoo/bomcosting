@@ -29,7 +29,7 @@ const EMPTY_FORM = {
   colorant_id: '', colorant_pct: 0,
   ink_id: '', ink_qty_per_pc: 0,
   machine_id: '', cycle_time_s: 60,
-  metal_insert_name: '', metal_insert_qty: 0, metal_insert_unit_price: 0,
+  metal_insert_name: '', metal_insert_qty: 0, metal_insert_unit_price: 0, metal_insert_image_url: '',
 }
 
 export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }: Props) {
@@ -40,13 +40,28 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingInsert, setUploadingInsert] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const insertFileRef = useRef<HTMLInputElement>(null)
   const [imageUrl, setImageUrl] = useState('')
 
   const resins = materials.filter(m => m.type === 'resin')
   const colorants = materials.filter(m => m.type === 'colorant')
   const inks = materials.filter(m => m.type === 'ink')
   const metalInserts = materials.filter(m => m.type === 'metal_insert')
+
+  async function handleUploadInsertImage(file: File) {
+    setUploadingInsert(true)
+    const supabase = createClient()
+    const ext = file.name.split('.').pop()
+    const path = `bom/${projectId}/insert-${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('product-images').upload(path, file, { upsert: true })
+    if (error) { toast.error('Upload ảnh thất bại'); setUploadingInsert(false); return }
+    const { data } = supabase.storage.from('product-images').getPublicUrl(path)
+    setForm(f => ({ ...f, metal_insert_image_url: data.publicUrl }))
+    setUploadingInsert(false)
+    toast.success('Đã upload ảnh kim loại')
+  }
 
   function openNew() {
     setForm({ ...EMPTY_FORM })
@@ -74,6 +89,7 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
       metal_insert_name: item.metal_insert_name ?? '',
       metal_insert_qty: item.metal_insert_qty ?? 0,
       metal_insert_unit_price: item.metal_insert_unit_price ?? 0,
+      metal_insert_image_url: item.metal_insert_image_url ?? '',
     })
     setImageUrl(item.image_url ?? '')
     setEditItem(item)
@@ -129,6 +145,7 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
       metal_insert_name: form.metal_insert_name || null,
       metal_insert_qty: form.metal_insert_qty,
       metal_insert_unit_price: form.metal_insert_unit_price,
+      metal_insert_image_url: form.metal_insert_image_url || null,
       image_url: imageUrl || null,
       updated_at: new Date().toISOString(),
     }
@@ -376,18 +393,24 @@ export function BomEditor({ projectId, bomItems, machines, materials, onUpdate }
                 <Label>Số lượng / sản phẩm (cái)</Label>
                 <Input type="number" min="0" value={form.metal_insert_qty} onChange={e => setForm(f => ({ ...f, metal_insert_qty: +e.target.value }))} />
               </div>
+
               <div className="space-y-1.5">
-                <Label>Đơn giá (VND/cái)</Label>
-                <Input type="number" min="0" step="100" value={form.metal_insert_unit_price} onChange={e => setForm(f => ({ ...f, metal_insert_unit_price: +e.target.value }))} />
-              </div>
-              {form.metal_insert_qty > 0 && form.metal_insert_unit_price > 0 && (
-                <div className="bg-teal-50 rounded-lg p-3 text-sm border border-teal-100">
-                  <span className="text-gray-500">Chi phí insert / sp: </span>
-                  <span className="font-semibold text-teal-700">
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(form.metal_insert_qty * form.metal_insert_unit_price)}
-                  </span>
+                <Label>Ảnh kim loại insert</Label>
+                <input ref={insertFileRef} type="file" accept="image/*" className="hidden"
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handleUploadInsertImage(f); e.target.value = '' }} />
+                <div className="flex items-center gap-3">
+                  <Button type="button" variant="outline" size="sm" onClick={() => insertFileRef.current?.click()} disabled={uploadingInsert}>
+                    <Image size={14} className="mr-1.5" />{uploadingInsert ? 'Đang upload...' : 'Chọn ảnh'}
+                  </Button>
+                  {form.metal_insert_image_url && (
+                    <div className="relative">
+                      <img src={form.metal_insert_image_url} alt="" className="w-12 h-12 object-cover rounded border" />
+                      <button type="button" onClick={() => setForm(f => ({ ...f, metal_insert_image_url: '' }))}
+                        className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full text-white flex items-center justify-center text-xs leading-none border-0 cursor-pointer">×</button>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider border-b pb-1 pt-2">Hình ảnh sản phẩm</p>
               <div className="space-y-1.5">

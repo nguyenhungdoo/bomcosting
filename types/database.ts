@@ -91,6 +91,7 @@ export interface BomItem {
   metal_insert_name?: string
   metal_insert_qty: number
   metal_insert_unit_price: number
+  metal_insert_image_url?: string
   image_url?: string
   created_at: string
   updated_at: string

@@ -370,9 +370,12 @@ export default function NewProjectPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2">
-            <Link href="/dashboard"
-              className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all shadow-sm">
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '8px' }}>
+            <Link href="/projects" style={{
+              padding: '10px 20px', borderRadius: '12px', border: '1.5px solid #e2e8f0',
+              background: 'white', fontSize: '13px', fontWeight: 600, color: '#374151',
+              textDecoration: 'none', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            }}>
               Hủy
             </Link>
             <button type="submit" disabled={loading}

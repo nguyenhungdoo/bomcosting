@@ -140,12 +140,9 @@ export default function MaterialsPage() {
                     <td style={{ padding: '12px 16px', color: '#64748b' }}>{m.unit}</td>
                     <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '12px' }}>{m.supplier ?? '—'}</td>
                     <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', opacity: 0 }}
-                        className="row-actions"
-                        onMouseEnter={e => (e.currentTarget as HTMLElement).style.opacity = '1'}
-                        onMouseLeave={e => (e.currentTarget as HTMLElement).style.opacity = '0'}>
-                        <button onClick={() => openEdit(m)} style={{ padding: '6px', borderRadius: '7px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', color: '#64748b' }}><Pencil size={13} /></button>
-                        <button onClick={() => handleDelete(m.id)} style={{ padding: '6px', borderRadius: '7px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={13} /></button>
+                      <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                        <button onClick={() => openEdit(m)} style={{ padding: '6px 10px', borderRadius: '7px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}><Pencil size={13} />Sửa</button>
+                        <button onClick={() => handleDelete(m.id)} style={{ padding: '6px 10px', borderRadius: '7px', border: '1px solid #fecaca', background: '#fff5f5', cursor: 'pointer', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}><Trash2 size={13} />Xóa</button>
                       </div>
                     </td>
                   </tr>

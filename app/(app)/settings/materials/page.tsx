@@ -55,7 +55,7 @@ export default function MaterialsPage() {
       ? await supabase.from('materials').update(payload).eq('id', edit.id)
       : await supabase.from('materials').insert(payload)
     if (error) toast.error('Lỗi: ' + error.message)
-    else { toast.success('Đã lưu'); setOpen(false); load() }
+    else { toast.success('Đã lưu'); setOpen(false); await load() }
     setSaving(false)
   }
 

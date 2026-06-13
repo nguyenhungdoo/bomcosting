@@ -12,11 +12,11 @@ import { toast } from 'sonner'
 import type { Project, ProjectStatus } from '@/types/database'
 
 const statusOptions: { value: ProjectStatus; label: string }[] = [
-  { value: 'draft', label: 'Nháp' },
-  { value: 'in_review', label: 'Đang xem xét' },
-  { value: 'quoted', label: 'Đã báo giá' },
-  { value: 'confirmed', label: 'Đã xác nhận' },
+  { value: 'draft',     label: 'Nháp' },
+  { value: 'quoting',   label: 'Đang báo giá' },
+  { value: 'quoted',    label: 'Đã báo giá' },
   { value: 'cancelled', label: 'Đã hủy' },
+  { value: 'other',     label: 'Khác' },
 ]
 
 export function ProjectInfo({ project }: { project: Project }) {

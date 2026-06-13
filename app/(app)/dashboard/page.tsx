@@ -5,12 +5,12 @@ import { Badge } from '@/components/ui/badge'
 import { Plus, FolderOpen, Clock, CheckCircle, FileText, ArrowUpRight, TrendingUp } from 'lucide-react'
 import type { Project } from '@/types/database'
 
-const statusConfig = {
-  draft:      { label: 'Nháp',           color: 'bg-slate-100 text-slate-600 border-slate-200' },
-  in_review:  { label: 'Đang xem xét',   color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  quoted:     { label: 'Đã báo giá',     color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  confirmed:  { label: 'Đã xác nhận',    color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  cancelled:  { label: 'Đã hủy',         color: 'bg-red-50 text-red-600 border-red-200' },
+const statusConfig: Record<string, { label: string; color: string }> = {
+  draft:     { label: 'Nháp',          color: 'bg-slate-100 text-slate-600 border-slate-200' },
+  quoting:   { label: 'Đang báo giá',  color: 'bg-amber-50 text-amber-700 border-amber-200' },
+  quoted:    { label: 'Đã báo giá',    color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  cancelled: { label: 'Đã hủy',        color: 'bg-red-50 text-red-600 border-red-200' },
+  other:     { label: 'Khác',          color: 'bg-gray-100 text-gray-600 border-gray-200' },
 }
 
 export default async function DashboardPage() {
@@ -24,9 +24,9 @@ export default async function DashboardPage() {
   const list = (projects ?? []) as Project[]
   const stats = {
     total:     list.length,
-    draft:     list.filter(p => p.status === 'draft' || p.status === 'in_review').length,
+    quoting:   list.filter(p => p.status === 'quoting').length,
     quoted:    list.filter(p => p.status === 'quoted').length,
-    confirmed: list.filter(p => p.status === 'confirmed').length,
+    cancelled: list.filter(p => p.status === 'cancelled').length,
   }
 
   const statCards = [
@@ -39,8 +39,8 @@ export default async function DashboardPage() {
       iconColor: 'text-indigo-600',
     },
     {
-      label: 'Đang thực hiện',
-      value: stats.draft,
+      label: 'Đang báo giá',
+      value: stats.quoting,
       icon: Clock,
       gradient: 'from-amber-500 to-orange-500',
       bg: 'bg-amber-50',
@@ -55,12 +55,12 @@ export default async function DashboardPage() {
       iconColor: 'text-sky-600',
     },
     {
-      label: 'Đã xác nhận',
-      value: stats.confirmed,
+      label: 'Đã hủy',
+      value: stats.cancelled,
       icon: CheckCircle,
-      gradient: 'from-emerald-500 to-green-600',
-      bg: 'bg-emerald-50',
-      iconColor: 'text-emerald-600',
+      gradient: 'from-red-400 to-red-600',
+      bg: 'bg-red-50',
+      iconColor: 'text-red-500',
     },
   ]
 

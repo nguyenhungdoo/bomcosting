@@ -3,12 +3,12 @@ import Link from 'next/link'
 import { Plus, FolderOpen, ArrowUpRight } from 'lucide-react'
 import type { Project } from '@/types/database'
 
-const statusConfig = {
-  draft:      { label: 'Nháp',         color: '#475569', bg: '#f1f5f9', border: '#e2e8f0' },
-  in_review:  { label: 'Đang xem xét', color: '#92400e', bg: '#fef3c7', border: '#fde68a' },
-  quoted:     { label: 'Đã báo giá',   color: '#1d4ed8', bg: '#dbeafe', border: '#bfdbfe' },
-  confirmed:  { label: 'Đã xác nhận',  color: '#065f46', bg: '#d1fae5', border: '#6ee7b7' },
-  cancelled:  { label: 'Đã hủy',       color: '#991b1b', bg: '#fee2e2', border: '#fca5a5' },
+const statusConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  draft:     { label: 'Nháp',          color: '#475569', bg: '#f1f5f9', border: '#e2e8f0' },
+  quoting:   { label: 'Đang báo giá',  color: '#92400e', bg: '#fef3c7', border: '#fde68a' },
+  quoted:    { label: 'Đã báo giá',    color: '#1d4ed8', bg: '#dbeafe', border: '#bfdbfe' },
+  cancelled: { label: 'Đã hủy',        color: '#991b1b', bg: '#fee2e2', border: '#fca5a5' },
+  other:     { label: 'Khác',          color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' },
 }
 
 export default async function ProjectsPage() {
@@ -21,10 +21,10 @@ export default async function ProjectsPage() {
   const list = (projects ?? []) as Project[]
 
   const stats = [
-    { label: 'Tổng dự án',     value: list.length,                                      color: '#1e5ab4', bg: '#dbeafe' },
-    { label: 'Đang thực hiện', value: list.filter(p => p.status === 'draft').length,     color: '#d97706', bg: '#fef3c7' },
-    { label: 'Đã báo giá',     value: list.filter(p => p.status === 'quoted').length,    color: '#1d4ed8', bg: '#eff6ff' },
-    { label: 'Đã xác nhận',    value: list.filter(p => p.status === 'confirmed').length, color: '#065f46', bg: '#d1fae5' },
+    { label: 'Tổng dự án',    value: list.length,                                       color: '#1e5ab4', bg: '#dbeafe' },
+    { label: 'Đang báo giá',  value: list.filter(p => p.status === 'quoting').length,   color: '#d97706', bg: '#fef3c7' },
+    { label: 'Đã báo giá',    value: list.filter(p => p.status === 'quoted').length,    color: '#1d4ed8', bg: '#eff6ff' },
+    { label: 'Đã hủy',        value: list.filter(p => p.status === 'cancelled').length, color: '#991b1b', bg: '#fee2e2' },
   ]
 
   return (

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { Mail, Lock, ArrowRight, Loader2, CheckCircle2, Shield, FileBarChart2, Globe } from 'lucide-react'
+import { Mail, KeyRound, ArrowRight, ArrowLeft, Loader2, CheckCircle2, Shield, FileBarChart2, Globe } from 'lucide-react'
 
 const features = [
   { icon: FileBarChart2, text: 'Tính BOM & chi phí tự động theo từng máy ép' },
@@ -15,17 +15,35 @@ const features = [
 
 export default function LoginPage() {
   const router = useRouter()
+  const [step, setStep] = useState<'email' | 'otp'>('email')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [otp, setOtp] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false },
+    })
     if (error) {
-      toast.error('Đăng nhập thất bại: ' + error.message)
+      toast.error('Không gửi được mã: ' + error.message)
+    } else {
+      toast.success('Đã gửi mã xác thực đến email của bạn')
+      setStep('otp')
+    }
+    setLoading(false)
+  }
+
+  async function handleVerifyOtp(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    const supabase = createClient()
+    const { error } = await supabase.auth.verifyOtp({ email, token: otp, type: 'email' })
+    if (error) {
+      toast.error('Mã không đúng hoặc đã hết hạn: ' + error.message)
     } else {
       router.push('/dashboard')
       router.refresh()
@@ -183,81 +201,121 @@ export default function LoginPage() {
                 Đăng nhập
               </h2>
               <p style={{ fontSize: '13.5px', color: '#64748b', margin: '0 0 28px' }}>
-                Nhập thông tin tài khoản để truy cập hệ thống
+                {step === 'email'
+                  ? 'Nhập email để nhận mã xác thực đăng nhập'
+                  : <>Mã xác thực đã gửi đến <strong style={{ color: '#374151' }}>{email}</strong></>}
               </p>
 
-              <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                {/* Email */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
-                    Email
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <Mail size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
-                    <input
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      required
-                      style={{
-                        width: '100%', boxSizing: 'border-box',
-                        paddingLeft: '40px', paddingRight: '14px', paddingTop: '11px', paddingBottom: '11px',
-                        borderRadius: '10px', border: '1.5px solid #e2e8f0',
-                        fontSize: '14px', color: '#0f172a', background: '#f8fafc',
-                        outline: 'none', transition: 'border-color 0.15s',
-                      }}
-                      onFocus={e => { e.target.style.borderColor = '#0ea5e9'; e.target.style.background = 'white' }}
-                      onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.background = '#f8fafc' }}
-                    />
+              {step === 'email' ? (
+                <form onSubmit={handleSendOtp} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                  {/* Email */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
+                      Email
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <Mail size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
+                      <input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                        autoFocus
+                        style={{
+                          width: '100%', boxSizing: 'border-box',
+                          paddingLeft: '40px', paddingRight: '14px', paddingTop: '11px', paddingBottom: '11px',
+                          borderRadius: '10px', border: '1.5px solid #e2e8f0',
+                          fontSize: '14px', color: '#0f172a', background: '#f8fafc',
+                          outline: 'none', transition: 'border-color 0.15s',
+                        }}
+                        onFocus={e => { e.target.style.borderColor = '#0ea5e9'; e.target.style.background = 'white' }}
+                        onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.background = '#f8fafc' }}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Password */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
-                    Mật khẩu
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <Lock size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      required
-                      style={{
-                        width: '100%', boxSizing: 'border-box',
-                        paddingLeft: '40px', paddingRight: '14px', paddingTop: '11px', paddingBottom: '11px',
-                        borderRadius: '10px', border: '1.5px solid #e2e8f0',
-                        fontSize: '14px', color: '#0f172a', background: '#f8fafc',
-                        outline: 'none', transition: 'border-color 0.15s',
-                      }}
-                      onFocus={e => { e.target.style.borderColor = '#0ea5e9'; e.target.style.background = 'white' }}
-                      onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.background = '#f8fafc' }}
-                    />
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                      width: '100%', padding: '12px',
+                      borderRadius: '10px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                      background: loading ? '#94a3b8' : 'linear-gradient(135deg, #1e5ab4, #0ea5e9)',
+                      color: 'white', fontSize: '14px', fontWeight: 700,
+                      boxShadow: loading ? 'none' : '0 4px 14px rgba(14,165,233,0.35)',
+                      transition: 'all 0.2s', marginTop: '4px',
+                    }}
+                  >
+                    {loading
+                      ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Đang gửi mã...</>
+                      : <>Gửi mã xác thực <ArrowRight size={15} /></>}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                  {/* OTP code */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
+                      Mã xác thực (6 số)
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <KeyRound size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="000000"
+                        value={otp}
+                        onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        required
+                        autoFocus
+                        style={{
+                          width: '100%', boxSizing: 'border-box',
+                          paddingLeft: '40px', paddingRight: '14px', paddingTop: '11px', paddingBottom: '11px',
+                          borderRadius: '10px', border: '1.5px solid #e2e8f0',
+                          fontSize: '18px', letterSpacing: '4px', color: '#0f172a', background: '#f8fafc',
+                          outline: 'none', transition: 'border-color 0.15s',
+                        }}
+                        onFocus={e => { e.target.style.borderColor = '#0ea5e9'; e.target.style.background = 'white' }}
+                        onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.background = '#f8fafc' }}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Submit */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                    width: '100%', padding: '12px',
-                    borderRadius: '10px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                    background: loading ? '#94a3b8' : 'linear-gradient(135deg, #1e5ab4, #0ea5e9)',
-                    color: 'white', fontSize: '14px', fontWeight: 700,
-                    boxShadow: loading ? 'none' : '0 4px 14px rgba(14,165,233,0.35)',
-                    transition: 'all 0.2s', marginTop: '4px',
-                  }}
-                >
-                  {loading
-                    ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Đang đăng nhập...</>
-                    : <>Đăng nhập <ArrowRight size={15} /></>}
-                </button>
-              </form>
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    disabled={loading || otp.length !== 6}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                      width: '100%', padding: '12px',
+                      borderRadius: '10px', border: 'none', cursor: loading || otp.length !== 6 ? 'not-allowed' : 'pointer',
+                      background: loading || otp.length !== 6 ? '#94a3b8' : 'linear-gradient(135deg, #1e5ab4, #0ea5e9)',
+                      color: 'white', fontSize: '14px', fontWeight: 700,
+                      boxShadow: loading || otp.length !== 6 ? 'none' : '0 4px 14px rgba(14,165,233,0.35)',
+                      transition: 'all 0.2s', marginTop: '4px',
+                    }}
+                  >
+                    {loading
+                      ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Đang xác thực...</>
+                      : <>Xác nhận & đăng nhập <ArrowRight size={15} /></>}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => { setStep('email'); setOtp('') }}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                      width: '100%', padding: '8px', background: 'none', border: 'none',
+                      color: '#64748b', fontSize: '13px', cursor: 'pointer',
+                    }}
+                  >
+                    <ArrowLeft size={13} /> Dùng email khác
+                  </button>
+                </form>
+              )}
 
               <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', marginTop: '20px', marginBottom: 0 }}>
                 Liên hệ quản trị viên để được cấp tài khoản

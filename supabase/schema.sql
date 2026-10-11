@@ -30,12 +30,28 @@ create policy "Technical/Director manage machines" on machines for all using (
   exists (select 1 from profiles where id = auth.uid() and role in ('technical','director'))
 );
 
--- MATERIALS (danh mục nguyên vật liệu: nhựa, bột màu, mực in)
+-- CUSTOMERS (danh mục khách hàng)
+create table customers (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  contact text,
+  email text,
+  phone text,
+  address text,
+  logo_url text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+alter table customers enable row level security;
+create policy "Authenticated read customers" on customers for select using (auth.role() = 'authenticated');
+create policy "Authenticated manage customers" on customers for all using (auth.role() = 'authenticated');
+
+-- MATERIALS (danh mục nguyên vật liệu: nhựa, bột màu, mực in, insert kim loại)
 create table materials (
   id uuid default gen_random_uuid() primary key,
   code text not null unique,
   name text not null,
-  type text not null check (type in ('resin','colorant','ink','other')),
+  type text not null check (type in ('resin','colorant','ink','metal_insert','other')),
   unit_price bigint not null default 0,
   unit text not null default 'kg',
   supplier text,
@@ -81,9 +97,10 @@ create table projects (
   customer_email text,
   customer_phone text,
   customer_address text,
+  customer_logo_url text,
   subject text,
   received_date date,
-  status text not null default 'draft' check (status in ('draft','in_review','quoted','confirmed','cancelled')),
+  status text not null default 'draft' check (status in ('draft','quoting','quoted','cancelled','other')),
   notes text,
   created_by uuid references auth.users not null,
   created_at timestamptz default now(),
@@ -112,6 +129,10 @@ create table bom_items (
   ink_qty_per_pc numeric(10,4) not null default 0,
   machine_id uuid references machines,
   cycle_time_s int not null default 60,
+  metal_insert_name text,
+  metal_insert_qty numeric(10,2) not null default 0,
+  metal_insert_unit_price bigint not null default 0,
+  metal_insert_image_url text,
   image_url text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()

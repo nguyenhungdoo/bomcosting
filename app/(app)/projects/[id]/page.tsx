@@ -9,10 +9,10 @@ import type { Project, BomItem, CostSettings, Machine, Material, Quotation } fro
 
 const statusConfig = {
   draft:      { label: 'Nháp',         color: 'bg-gray-100 text-gray-700' },
-  in_review:  { label: 'Đang xem xét', color: 'bg-yellow-100 text-yellow-700' },
+  quoting:    { label: 'Đang báo giá', color: 'bg-yellow-100 text-yellow-700' },
   quoted:     { label: 'Đã báo giá',   color: 'bg-blue-100 text-blue-700' },
-  confirmed:  { label: 'Đã xác nhận',  color: 'bg-green-100 text-green-700' },
   cancelled:  { label: 'Đã hủy',       color: 'bg-red-100 text-red-700' },
+  other:      { label: 'Khác',         color: 'bg-gray-100 text-gray-600' },
 }
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
